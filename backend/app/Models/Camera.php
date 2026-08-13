@@ -15,4 +15,9 @@ class Camera extends Model
     {
         return $this->hasMany(Violation::class);
     }
+
+    public function trafficEvents(): HasMany
+    {
+        return $this->hasMany(TrafficEvent::class);
+    }
 }
