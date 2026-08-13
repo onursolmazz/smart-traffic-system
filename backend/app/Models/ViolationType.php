@@ -2,15 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Vehicle extends Model
+class ViolationType extends Model
 {
     //
-    use HasFactory, SoftDeletes;
+    use SoftDeletes;
 
     public function violations(): HasMany
     {

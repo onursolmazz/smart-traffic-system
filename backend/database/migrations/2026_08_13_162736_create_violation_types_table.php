@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('vehicles', function (Blueprint $table) {
+        Schema::create('violation_types', function (Blueprint $table) {
             $table->id();
-            $table->string('plate')->unique();
-            $table->string('brand')->nullable();
-            $table->string('model')->nullable();
-            $table->string('color')->nullable();
-            $table->unsignedSmallInteger('year')->nullable();
+            $table->string('name');
+            $table->string('code')->unique();
+            $table->string('description')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('vehicles');
+        Schema::dropIfExists('violation_types');
     }
 };
