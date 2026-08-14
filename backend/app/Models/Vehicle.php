@@ -12,6 +12,14 @@ class Vehicle extends Model
     //
     use HasFactory, SoftDeletes;
 
+    protected $fillable = [
+        'plate',
+        'brand',
+        'model',
+        'color',
+        'year',
+    ];
+
     public function violations(): HasMany
     {
         return $this->hasMany(Violation::class);
