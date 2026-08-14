@@ -12,6 +12,15 @@ class Camera extends Model
     //
     use SoftDeletes, HasFactory;
 
+    protected $fillable = [
+        'name',
+        'code',
+        'latitude',
+        'longitude',
+        'status',
+        'speed_limit',
+    ];
+
     public function violations(): HasMany
     {
         return $this->hasMany(Violation::class);
