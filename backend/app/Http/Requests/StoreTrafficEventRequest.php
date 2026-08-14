@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateTrafficEventRequest extends FormRequest
+class StoreTrafficEventRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -16,14 +16,12 @@ class UpdateTrafficEventRequest extends FormRequest
     {
         return [
             'camera_id' => [
-                'sometimes',
                 'nullable',
                 Rule::exists('cameras', 'id')
                     ->whereNull('deleted_at'),
             ],
 
             'type' => [
-                'sometimes',
                 'required',
                 Rule::in([
                     'ACCIDENT',
@@ -35,20 +33,17 @@ class UpdateTrafficEventRequest extends FormRequest
             ],
 
             'title' => [
-                'sometimes',
                 'required',
                 'string',
                 'max:255',
             ],
 
             'description' => [
-                'sometimes',
                 'nullable',
                 'string',
             ],
 
             'severity' => [
-                'sometimes',
                 'required',
                 Rule::in([
                     'low',
@@ -59,7 +54,6 @@ class UpdateTrafficEventRequest extends FormRequest
             ],
 
             'status' => [
-                'sometimes',
                 'required',
                 Rule::in([
                     'active',
@@ -68,29 +62,26 @@ class UpdateTrafficEventRequest extends FormRequest
             ],
 
             'latitude' => [
-                'sometimes',
                 'required',
                 'numeric',
                 'between:-90,90',
             ],
 
             'longitude' => [
-                'sometimes',
                 'required',
                 'numeric',
                 'between:-180,180',
             ],
 
             'occurred_at' => [
-                'sometimes',
                 'required',
                 'date',
             ],
 
             'resolved_at' => [
-                'sometimes',
                 'nullable',
                 'date',
+                'after_or_equal:occurred_at',
             ],
         ];
     }
