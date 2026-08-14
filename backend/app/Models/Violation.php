@@ -12,6 +12,19 @@ class Violation extends Model
     //
     use SoftDeletes, HasFactory;
 
+    protected $fillable = [
+        'vehicle_id',
+        'camera_id',
+        'violation_type_id',
+        'speed',
+        'speed_limit',
+        'latitude',
+        'longitude',
+        'image_path',
+        'status',
+        'detected_at',
+    ];
+
     public function vehicle(): BelongsTo
     {
         return $this->belongsTo(Vehicle::class);
