@@ -5,8 +5,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\CameraController;
 use App\Http\Controllers\Api\ViolationController;
 use App\Http\Controllers\Api\TrafficEventController;
+use App\Http\Controllers\Api\DashboardController;
 
 Route::apiResource('vehicles', VehicleController::class);
 Route::apiResource('cameras', CameraController::class);
-Route::apiResource('violations',ViolationController::class);
-Route::apiResource('traffic-events',TrafficEventController::class);
+Route::apiResource('violations', ViolationController::class);
+Route::apiResource('traffic-events', TrafficEventController::class);
+Route::get('dashboard',[DashboardController::class, 'index']);
