@@ -1,5 +1,4 @@
 import { Bell } from "lucide-react";
-
 import { useLocation } from "react-router-dom";
 
 interface PageInfo {
@@ -13,9 +12,15 @@ const pageInfo: Record<string, PageInfo> = {
     description: "Trafik sisteminin genel durumunu görüntüleyin.",
   },
 
+  "/map": {
+    title: "Trafik Haritası",
+    description:
+      "Kameraları ve trafik olaylarını harita üzerinde görüntüleyin.",
+  },
+
   "/vehicles": {
     title: "Araçlar",
-    description: "Sistemde kayıtlı araçları yönetin.",
+    description: "Sistemde kayıtlı araçları görüntüleyin ve yönetin.",
   },
 
   "/cameras": {

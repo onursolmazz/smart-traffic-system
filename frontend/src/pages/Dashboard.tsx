@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Camera, Car, RadioTower, TriangleAlert } from "lucide-react";
 
 import ActiveTrafficEvents from "../components/ActiveTrafficEvents";
+import DashboardTrafficMap from "../components/DashboardTrafficMap";
 import RecentViolationsTable from "../components/RecentViolationsTable";
 import StatCard from "../components/StatCard";
 import ViolationChart from "../components/ViolationChart";
@@ -13,25 +14,47 @@ import api from "../services/api";
 
 import type { DashboardResponse } from "../types/dashboard";
 
+import type { Camera as CameraType, CamerasResponse } from "../types/camera";
+
 function Dashboard() {
   const [dashboard, setDashboard] = useState<DashboardResponse | null>(null);
+
+  const [cameras, setCameras] = useState<CameraType[]>([]);
 
   const [loading, setLoading] = useState(true);
 
   const [error, setError] = useState("");
 
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
   useEffect(() => {
     let cancelled = false;
 
-    const fetchDashboard = async () => {
+    const loadDashboard = async () => {
       try {
-        const response = await api.get<DashboardResponse>("/dashboard");
+        const [dashboardResponse, camerasResponse] = await Promise.all([
+          api.get<DashboardResponse>("/dashboard"),
+
+          api.get<CamerasResponse>("/cameras", {
+            params: {
+              per_page: 100,
+
+              sort_by: "name",
+
+              sort_direction: "asc",
+            },
+          }),
+        ]);
 
         if (cancelled) {
           return;
         }
 
-        setDashboard(response.data);
+        setDashboard(dashboardResponse.data);
+
+        setCameras(camerasResponse.data.data);
+
+        setLastUpdated(new Date());
 
         setError("");
       } catch (error) {
@@ -39,7 +62,7 @@ function Dashboard() {
           return;
         }
 
-        console.error(error);
+        console.error("GÖSTERGE PANELİ HATASI:", error);
 
         setError("Gösterge paneli verileri alınamadı.");
       } finally {
@@ -49,10 +72,16 @@ function Dashboard() {
       }
     };
 
-    void fetchDashboard();
+    void loadDashboard();
+
+    const intervalId = window.setInterval(() => {
+      void loadDashboard();
+    }, 30_000);
 
     return () => {
       cancelled = true;
+
+      window.clearInterval(intervalId);
     };
   }, []);
 
@@ -60,7 +89,7 @@ function Dashboard() {
     return <Loading text="Gösterge paneli yükleniyor..." />;
   }
 
-  if (error) {
+  if (error && !dashboard) {
     return <div className="page-message error-message">{error}</div>;
   }
 
@@ -70,6 +99,31 @@ function Dashboard() {
 
   return (
     <div className="dashboard-page">
+      <div className="dashboard-live-row">
+        <div className="live-indicator">
+          <span className="live-dot" />
+          Canlı sistem
+        </div>
+
+        {lastUpdated && (
+          <span className="last-updated">
+            Son güncelleme:{" "}
+            {lastUpdated.toLocaleTimeString("tr-TR", {
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            })}
+          </span>
+        )}
+      </div>
+
+      {error && (
+        <div className="dashboard-refresh-error">
+          Son yenilemede bir hata oluştu. Mevcut veriler gösterilmeye devam
+          ediyor.
+        </div>
+      )}
+
       <div className="stats-grid">
         <StatCard
           title="Toplam Araç"
@@ -125,6 +179,27 @@ function Dashboard() {
           <ActiveTrafficEvents events={dashboard.active_traffic_events} />
         </section>
       </div>
+
+      <section className="panel dashboard-map-panel">
+        <div className="panel-header">
+          <div>
+            <h3>Canlı Trafik Haritası</h3>
+
+            <p>Kamera ve aktif trafik olaylarının konumları</p>
+          </div>
+
+          <div className="dashboard-map-summary">
+            <span>{cameras.length} Kamera</span>
+
+            <span>{dashboard.active_traffic_events.length} Aktif Olay</span>
+          </div>
+        </div>
+
+        <DashboardTrafficMap
+          cameras={cameras}
+          events={dashboard.active_traffic_events}
+        />
+      </section>
 
       <section className="panel recent-violations">
         <div className="panel-header">

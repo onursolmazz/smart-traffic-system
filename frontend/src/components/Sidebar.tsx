@@ -1,6 +1,7 @@
 import {
   Camera,
   Car,
+  Map,
   Gauge,
   LayoutDashboard,
   TriangleAlert,
@@ -32,7 +33,13 @@ function Sidebar() {
           <LayoutDashboard size={19} />
           Gösterge Paneli
         </NavLink>
-
+        <NavLink
+          to="/map"
+          className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
+        >
+          <Map size={19} />
+          Trafik Haritası
+        </NavLink>
         <NavLink
           to="/vehicles"
           className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}

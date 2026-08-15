@@ -2,7 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
-
+import TrafficMap from "./pages/TrafficMap";
 import Cameras from "./pages/Cameras";
 import Dashboard from "./pages/Dashboard";
 import TrafficEvents from "./pages/TrafficEvents";
@@ -23,6 +23,7 @@ function App() {
             <Route path="/cameras" element={<Cameras />} />
             <Route path="/violations" element={<Violations />} />
             <Route path="/traffic-events" element={<TrafficEvents />} />
+            <Route path="/map" element={<TrafficMap />} />
           </Routes>
         </main>
       </div>
