@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Violation extends Model
 {
@@ -38,5 +39,10 @@ class Violation extends Model
     public function violationType(): BelongsTo
     {
         return $this->belongsTo(ViolationType::class);
+    }
+
+    public function alerts(): HasOne
+    {
+        return $this->hasOne(Alert::class);
     }
 }

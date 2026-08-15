@@ -1,11 +1,12 @@
 import {
+  Bell,
   Camera,
   Car,
-  Map,
   Gauge,
   LayoutDashboard,
-  TriangleAlert,
+  Map,
   TrafficCone,
+  TriangleAlert,
 } from "lucide-react";
 
 import { NavLink } from "react-router-dom";
@@ -19,9 +20,10 @@ function Sidebar() {
         </div>
 
         <div>
-          <h2>Akıllı Trafik</h2>
-
-          <span>Yönetim Sistemi</span>
+          <NavLink to="/" className="" style={{textDecoration : "none" }}>
+            <h2>Akıllı Trafik</h2>
+            <span>Yönetim Sistemi</span>
+          </NavLink>
         </div>
       </div>
 
@@ -33,6 +35,7 @@ function Sidebar() {
           <LayoutDashboard size={19} />
           Gösterge Paneli
         </NavLink>
+
         <NavLink
           to="/map"
           className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
@@ -40,6 +43,7 @@ function Sidebar() {
           <Map size={19} />
           Trafik Haritası
         </NavLink>
+
         <NavLink
           to="/vehicles"
           className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
@@ -70,6 +74,14 @@ function Sidebar() {
         >
           <Gauge size={19} />
           Trafik Olayları
+        </NavLink>
+
+        <NavLink
+          to="/alerts"
+          className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
+        >
+          <Bell size={19} />
+          Bildirimler
         </NavLink>
       </nav>
 

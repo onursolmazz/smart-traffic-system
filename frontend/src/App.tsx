@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import TrafficEvents from "./pages/TrafficEvents";
 import Vehicles from "./pages/Vehicles";
 import Violations from "./pages/Violations";
+import Alerts from "./pages/Alerts";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route path="/violations" element={<Violations />} />
             <Route path="/traffic-events" element={<TrafficEvents />} />
             <Route path="/map" element={<TrafficMap />} />
+            <Route path="/alerts" element={<Alerts />} />
           </Routes>
         </main>
       </div>

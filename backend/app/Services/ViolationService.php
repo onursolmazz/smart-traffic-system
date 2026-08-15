@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Violation;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
+use App\Jobs\ProcessViolation;
 
 class ViolationService
 {
@@ -121,7 +122,11 @@ class ViolationService
     {
         $violation = Violation::create($data);
         Cache::forget('dashboard.statistics');
-        return $this->loadRelations($violation);
+        ProcessViolation::dispatch(
+            $violation->id
+        );
+
+        return $violation;
     }
 
     public function update(
