@@ -42,7 +42,7 @@ class VehicleService
 
     public function create(array $data): Vehicle
     {
-        return Vehicle::create($data);
+        $vehicle = Vehicle::create($data);
         Cache::forget('dashboard.statistics');
         return $vehicle;
     }
