@@ -4,6 +4,16 @@ interface RecentViolationsTableProps {
   violations: RecentViolation[];
 }
 
+function getStatusLabel(status: string) {
+  const labels: Record<string, string> = {
+    detected: "Tespit Edildi",
+    reviewed: "İncelendi",
+    approved: "Onaylandı",
+  };
+
+  return labels[status] ?? status;
+}
+
 function RecentViolationsTable({ violations }: RecentViolationsTableProps) {
   if (violations.length === 0) {
     return <div className="empty-state">Henüz ihlal bulunmuyor.</div>;
@@ -41,7 +51,7 @@ function RecentViolationsTable({ violations }: RecentViolationsTableProps) {
 
                 <td>
                   <span className={`status-badge ${violation.status}`}>
-                    {violation.status}
+                    {getStatusLabel(violation.status)}
                   </span>
                 </td>
 

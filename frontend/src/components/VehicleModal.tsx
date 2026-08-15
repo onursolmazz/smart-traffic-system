@@ -1,10 +1,14 @@
 import { useState } from "react";
+
 import type { ChangeEvent, FormEvent } from "react";
 
 import axios from "axios";
+
 import { X } from "lucide-react";
 
 import api from "../services/api";
+
+import useToast from "../hooks/useToast";
 
 import type { Vehicle, VehicleFormData } from "../types/vehicle";
 
@@ -43,6 +47,8 @@ function VehicleModal({ vehicle, onClose, onSaved }: VehicleModalProps) {
 
   const [error, setError] = useState("");
 
+  const { showToast } = useToast();
+
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
 
@@ -50,6 +56,8 @@ function VehicleModal({ vehicle, onClose, onSaved }: VehicleModalProps) {
       ...current,
       [name]: value,
     }));
+
+    setError("");
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -77,11 +85,15 @@ function VehicleModal({ vehicle, onClose, onSaved }: VehicleModalProps) {
         await api.post("/vehicles", payload);
       }
 
-      await onSaved();
+      showToast(
+        vehicle ? "Araç başarıyla güncellendi." : "Araç başarıyla eklendi.",
+        "success",
+      );
 
+      onSaved();
       onClose();
     } catch (error) {
-      console.error("VEHICLE SAVE ERROR:", error);
+      console.error("ARAÇ KAYDETME HATASI:", error);
 
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 422) {
@@ -129,6 +141,7 @@ function VehicleModal({ vehicle, onClose, onSaved }: VehicleModalProps) {
             type="button"
             className="modal-close-button"
             onClick={onClose}
+            disabled={saving}
           >
             <X size={20} />
           </button>
@@ -189,7 +202,7 @@ function VehicleModal({ vehicle, onClose, onSaved }: VehicleModalProps) {
                 type="text"
                 value={form.color}
                 onChange={handleChange}
-                placeholder="White"
+                placeholder="Beyaz"
               />
             </div>
 

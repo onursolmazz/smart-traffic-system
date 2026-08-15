@@ -6,6 +6,17 @@ interface ActiveTrafficEventsProps {
   events: TrafficEvent[];
 }
 
+function getSeverityLabel(severity: string) {
+  const labels: Record<string, string> = {
+    low: "Düşük",
+    medium: "Orta",
+    high: "Yüksek",
+    critical: "Kritik",
+  };
+
+  return labels[severity] ?? severity;
+}
+
 function ActiveTrafficEvents({ events }: ActiveTrafficEventsProps) {
   if (events.length === 0) {
     return <div className="empty-state">Aktif trafik olayı bulunmuyor.</div>;
@@ -13,25 +24,25 @@ function ActiveTrafficEvents({ events }: ActiveTrafficEventsProps) {
 
   return (
     <div className="events-list">
-      {events.map((event) => (
-        <div className="event-item" key={event.id}>
+      {events.map((trafficEvent) => (
+        <div className="event-item" key={trafficEvent.id}>
           <div className="event-icon">
             <CircleAlert size={18} />
           </div>
 
           <div className="event-info">
             <div className="event-title-row">
-              <strong>{event.title}</strong>
+              <strong>{trafficEvent.title}</strong>
 
-              <span className={`severity-badge ${event.severity}`}>
-                {event.severity}
+              <span className={`severity-badge ${trafficEvent.severity}`}>
+                {getSeverityLabel(trafficEvent.severity)}
               </span>
             </div>
 
-            <p>{event.camera?.name ?? "Kamera bilgisi yok"}</p>
+            <p>{trafficEvent.camera?.name ?? "Kamera bilgisi yok"}</p>
 
             <span className="event-date">
-              {new Date(event.occurred_at).toLocaleString("tr-TR")}
+              {new Date(trafficEvent.occurred_at).toLocaleString("tr-TR")}
             </span>
           </div>
         </div>

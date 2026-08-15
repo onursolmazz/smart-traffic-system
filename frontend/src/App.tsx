@@ -1,6 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-
-import "./App.css";
+import { Navigate, Route, Routes } from "react-router-dom";
 
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
@@ -13,31 +11,22 @@ import Violations from "./pages/Violations";
 
 function App() {
   return (
-    <BrowserRouter>
-      <div className="app-layout">
-        <Sidebar />
-
-        <main className="main-area">
-          <Header />
-
-          <div className="page-content">
-            <Routes>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-
-              <Route path="/dashboard" element={<Dashboard />} />
-
-              <Route path="/vehicles" element={<Vehicles />} />
-
-              <Route path="/cameras" element={<Cameras />} />
-
-              <Route path="/violations" element={<Violations />} />
-
-              <Route path="/traffic-events" element={<TrafficEvents />} />
-            </Routes>
-          </div>
+    <div className="app">
+      <Sidebar />
+      <div className="main-content">
+        <Header />
+        <main className="page-content">
+          <Routes>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/vehicles" element={<Vehicles />} />
+            <Route path="/cameras" element={<Cameras />} />
+            <Route path="/violations" element={<Violations />} />
+            <Route path="/traffic-events" element={<TrafficEvents />} />
+          </Routes>
         </main>
       </div>
-    </BrowserRouter>
+    </div>
   );
 }
 

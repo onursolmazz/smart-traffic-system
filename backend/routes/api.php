@@ -6,9 +6,11 @@ use App\Http\Controllers\Api\CameraController;
 use App\Http\Controllers\Api\ViolationController;
 use App\Http\Controllers\Api\TrafficEventController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\ViolationTypeController;
 
 Route::apiResource('vehicles', VehicleController::class);
 Route::apiResource('cameras', CameraController::class);
 Route::apiResource('violations', ViolationController::class);
 Route::apiResource('traffic-events', TrafficEventController::class);
 Route::get('dashboard',[DashboardController::class, 'index']);
+Route::get('violation-types',[ViolationTypeController::class, 'index']);

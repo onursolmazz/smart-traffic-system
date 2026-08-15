@@ -19,28 +19,25 @@ function ViolationChart({ data }: ViolationChartProps) {
     <div className="chart-container">
       <ResponsiveContainer width="100%" height={280}>
         <BarChart data={data}>
-          <CartesianGrid
-            strokeDasharray="3 3"
-            vertical={false}
-          />
+          <CartesianGrid strokeDasharray="3 3" vertical={false} />
 
           <XAxis
             dataKey="name"
-            tick={{ fontSize: 11 }}
+            tick={{
+              fontSize: 11,
+            }}
           />
 
           <YAxis
             allowDecimals={false}
-            tick={{ fontSize: 11 }}
+            tick={{
+              fontSize: 11,
+            }}
           />
 
-          <Tooltip />
+          <Tooltip formatter={(value) => [value, "İhlal Sayısı"]} />
 
-          <Bar
-            dataKey="count"
-            fill="#22c55e"
-            radius={[6, 6, 0, 0]}
-          />
+          <Bar dataKey="count" fill="#22c55e" radius={[6, 6, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

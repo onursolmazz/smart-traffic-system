@@ -6,6 +6,7 @@ import {
   TriangleAlert,
   TrafficCone,
 } from "lucide-react";
+
 import { NavLink } from "react-router-dom";
 
 function Sidebar() {
@@ -17,8 +18,9 @@ function Sidebar() {
         </div>
 
         <div>
-          <h2>Smart Traffic</h2>
-          <span>Management System</span>
+          <h2>Akıllı Trafik</h2>
+
+          <span>Yönetim Sistemi</span>
         </div>
       </div>
 
@@ -28,7 +30,7 @@ function Sidebar() {
           className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
         >
           <LayoutDashboard size={19} />
-          Dashboard
+          Gösterge Paneli
         </NavLink>
 
         <NavLink
@@ -36,7 +38,7 @@ function Sidebar() {
           className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
         >
           <Car size={19} />
-          Vehicles
+          Araçlar
         </NavLink>
 
         <NavLink
@@ -44,7 +46,7 @@ function Sidebar() {
           className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
         >
           <Camera size={19} />
-          Cameras
+          Kameralar
         </NavLink>
 
         <NavLink
@@ -52,7 +54,7 @@ function Sidebar() {
           className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
         >
           <TriangleAlert size={19} />
-          Violations
+          İhlaller
         </NavLink>
 
         <NavLink
@@ -60,16 +62,16 @@ function Sidebar() {
           className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
         >
           <Gauge size={19} />
-          Traffic Events
+          Trafik Olayları
         </NavLink>
       </nav>
 
       <div className="sidebar-footer">
-        <span>System Status</span>
+        <span>Sistem Durumu</span>
 
         <div className="system-status">
           <span className="status-dot" />
-          All systems operational
+          Tüm sistemler çalışıyor
         </div>
       </div>
     </aside>

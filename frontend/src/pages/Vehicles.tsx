@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { FormEvent } from "react";
 
@@ -11,8 +11,14 @@ import {
   Trash2,
 } from "lucide-react";
 
-import api from "../services/api";
 import VehicleModal from "../components/VehicleModal";
+
+import ConfirmModal from "../components/ui/ConfirmModal";
+import Loading from "../components/ui/Loading";
+
+import useToast from "../hooks/useToast";
+
+import api from "../services/api";
 
 import type { Vehicle, VehiclesResponse } from "../types/vehicle";
 
@@ -20,13 +26,17 @@ function Vehicles() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
 
   const [loading, setLoading] = useState(true);
+
   const [error, setError] = useState("");
 
   const [searchInput, setSearchInput] = useState("");
+
   const [search, setSearch] = useState("");
 
   const [page, setPage] = useState(1);
+
   const [lastPage, setLastPage] = useState(1);
+
   const [total, setTotal] = useState(0);
 
   const [perPage, setPerPage] = useState(10);
@@ -39,36 +49,65 @@ function Vehicles() {
 
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
 
+  const [vehicleToDelete, setVehicleToDelete] = useState<Vehicle | null>(null);
+
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  const fetchVehicles = useCallback(async () => {
-    try {
-      const response = await api.get<VehiclesResponse>("/vehicles", {
-        params: {
-          search: search || undefined,
-          page,
-          per_page: perPage,
-          sort_by: sortBy,
-          sort_direction: sortDirection,
-        },
-      });
+  const [refreshKey, setRefreshKey] = useState(0);
 
-      setVehicles(response.data.data);
-      setLastPage(response.data.meta.last_page);
-      setTotal(response.data.meta.total);
-      setError("");
-    } catch (error) {
-      console.error(error);
-
-      setError("Araçlar alınamadı.");
-    } finally {
-      setLoading(false);
-    }
-  }, [search, page, perPage, sortBy, sortDirection]);
+  const { showToast } = useToast();
 
   useEffect(() => {
-    fetchVehicles();
-  }, [fetchVehicles]);
+    let cancelled = false;
+
+    const loadVehicles = async () => {
+      try {
+        const response = await api.get<VehiclesResponse>("/vehicles", {
+          params: {
+            search: search || undefined,
+
+            page,
+
+            per_page: perPage,
+
+            sort_by: sortBy,
+
+            sort_direction: sortDirection,
+          },
+        });
+
+        if (cancelled) {
+          return;
+        }
+
+        setVehicles(response.data.data);
+
+        setLastPage(response.data.meta.last_page);
+
+        setTotal(response.data.meta.total);
+
+        setError("");
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+
+        console.error(error);
+
+        setError("Araçlar alınamadı.");
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void loadVehicles();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [search, page, perPage, sortBy, sortDirection, refreshKey]);
 
   const startLoading = () => {
     setLoading(true);
@@ -81,6 +120,7 @@ function Vehicles() {
     startLoading();
 
     setPage(1);
+
     setSearch(searchInput.trim());
   };
 
@@ -90,58 +130,57 @@ function Vehicles() {
     setSearchInput("");
     setSearch("");
     setPage(1);
+
+    setRefreshKey((current) => current + 1);
   };
 
   const handleOpenCreateModal = () => {
     setSelectedVehicle(null);
+
     setModalOpen(true);
   };
 
   const handleOpenEditModal = (vehicle: Vehicle) => {
     setSelectedVehicle(vehicle);
+
     setModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setModalOpen(false);
+
     setSelectedVehicle(null);
   };
 
-  const handleVehicleSaved = async () => {
+  const handleVehicleSaved = () => {
     startLoading();
 
-    await fetchVehicles();
+    setRefreshKey((current) => current + 1);
   };
 
   const handleDelete = async (vehicle: Vehicle) => {
-    const confirmed = window.confirm(
-      `${vehicle.plate} plakalı aracı silmek istediğinize emin misiniz?`,
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
     try {
       setDeletingId(vehicle.id);
 
       await api.delete(`/vehicles/${vehicle.id}`);
 
-      if (vehicles.length === 1 && page > 1) {
-        startLoading();
+      setVehicleToDelete(null);
 
-        setPage((currentPage) => currentPage - 1);
+      showToast(`${vehicle.plate} plakalı araç silindi.`, "success");
+
+      startLoading();
+
+      if (vehicles.length === 1 && page > 1) {
+        setPage((current) => current - 1);
 
         return;
       }
 
-      startLoading();
-
-      await fetchVehicles();
+      setRefreshKey((current) => current + 1);
     } catch (error) {
       console.error(error);
 
-      window.alert("Araç silinirken bir hata oluştu.");
+      showToast("Araç silinirken bir hata oluştu.", "error");
     } finally {
       setDeletingId(null);
     }
@@ -151,7 +190,7 @@ function Vehicles() {
     <div className="vehicles-page">
       <div className="page-heading">
         <div>
-          <h1>Vehicles</h1>
+          <h1>Araçlar</h1>
 
           <p>Sistemde kayıtlı araçları görüntüleyin ve yönetin.</p>
         </div>
@@ -201,6 +240,7 @@ function Vehicles() {
               startLoading();
 
               setPage(1);
+
               setSortBy(event.target.value);
             }}
           >
@@ -241,16 +281,20 @@ function Vehicles() {
             }}
           >
             <option value={5}>5</option>
+
             <option value={10}>10</option>
+
             <option value={15}>15</option>
+
             <option value={25}>25</option>
+
             <option value={50}>50</option>
           </select>
         </div>
       </div>
 
       <div className="vehicles-card">
-        {loading && <div className="table-state">Araçlar yükleniyor...</div>}
+        {loading && <Loading text="Araçlar yükleniyor..." />}
 
         {!loading && error && (
           <div className="table-state error-message">{error}</div>
@@ -314,12 +358,11 @@ function Vehicles() {
                           <button
                             type="button"
                             className="table-delete-button"
-                            onClick={() => handleDelete(vehicle)}
+                            onClick={() => setVehicleToDelete(vehicle)}
                             disabled={deletingId === vehicle.id}
                           >
                             <Trash2 size={15} />
-
-                            {deletingId === vehicle.id ? "Siliniyor..." : "Sil"}
+                            Sil
                           </button>
                         </div>
                       </td>
@@ -341,7 +384,7 @@ function Vehicles() {
                   onClick={() => {
                     startLoading();
 
-                    setPage((currentPage) => Math.max(currentPage - 1, 1));
+                    setPage((current) => Math.max(current - 1, 1));
                   }}
                 >
                   <ChevronLeft size={17} />
@@ -357,9 +400,7 @@ function Vehicles() {
                   onClick={() => {
                     startLoading();
 
-                    setPage((currentPage) =>
-                      Math.min(currentPage + 1, lastPage),
-                    );
+                    setPage((current) => Math.min(current + 1, lastPage));
                   }}
                 >
                   <ChevronRight size={17} />
@@ -376,6 +417,18 @@ function Vehicles() {
           vehicle={selectedVehicle}
           onClose={handleCloseModal}
           onSaved={handleVehicleSaved}
+        />
+      )}
+
+      {vehicleToDelete && (
+        <ConfirmModal
+          open={true}
+          title="Aracı Sil"
+          message={`${vehicleToDelete.plate} plakalı aracı silmek istediğinize emin misiniz?`}
+          confirmText="Aracı Sil"
+          loading={deletingId === vehicleToDelete.id}
+          onCancel={() => setVehicleToDelete(null)}
+          onConfirm={() => void handleDelete(vehicleToDelete)}
         />
       )}
     </div>

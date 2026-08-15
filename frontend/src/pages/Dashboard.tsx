@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
-import { Camera, Car, TriangleAlert, RadioTower } from "lucide-react";
+
+import { Camera, Car, RadioTower, TriangleAlert } from "lucide-react";
+
 import ActiveTrafficEvents from "../components/ActiveTrafficEvents";
 import RecentViolationsTable from "../components/RecentViolationsTable";
-import ViolationChart from "../components/ViolationChart";
-import api from "../services/api";
 import StatCard from "../components/StatCard";
+import ViolationChart from "../components/ViolationChart";
+
+import Loading from "../components/ui/Loading";
+
+import api from "../services/api";
 
 import type { DashboardResponse } from "../types/dashboard";
 
@@ -16,25 +21,43 @@ function Dashboard() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    let cancelled = false;
+
     const fetchDashboard = async () => {
       try {
         const response = await api.get<DashboardResponse>("/dashboard");
 
+        if (cancelled) {
+          return;
+        }
+
         setDashboard(response.data);
+
+        setError("");
       } catch (error) {
+        if (cancelled) {
+          return;
+        }
+
         console.error(error);
 
-        setError("Dashboard verileri alınamadı.");
+        setError("Gösterge paneli verileri alınamadı.");
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
-    fetchDashboard();
+    void fetchDashboard();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   if (loading) {
-    return <div className="page-message">Dashboard yükleniyor...</div>;
+    return <Loading text="Gösterge paneli yükleniyor..." />;
   }
 
   if (error) {
@@ -49,31 +72,31 @@ function Dashboard() {
     <div className="dashboard-page">
       <div className="stats-grid">
         <StatCard
-          title="Total Vehicles"
+          title="Toplam Araç"
           value={dashboard.total_vehicles}
           icon={Car}
-          description="Registered vehicles"
+          description="Sisteme kayıtlı araçlar"
         />
 
         <StatCard
-          title="Active Cameras"
+          title="Aktif Kameralar"
           value={dashboard.active_cameras}
           icon={Camera}
-          description="Currently online"
+          description="Şu anda aktif kameralar"
         />
 
         <StatCard
-          title="Today's Violations"
+          title="Bugünkü İhlaller"
           value={dashboard.today_violations}
           icon={TriangleAlert}
-          description="Detected today"
+          description="Bugün tespit edilen ihlaller"
         />
 
         <StatCard
-          title="Active Events"
+          title="Aktif Olaylar"
           value={dashboard.active_events}
           icon={RadioTower}
-          description="Ongoing traffic events"
+          description="Devam eden trafik olayları"
         />
       </div>
 
@@ -81,18 +104,21 @@ function Dashboard() {
         <section className="panel chart-placeholder">
           <div className="panel-header">
             <div>
-              <h3>Violation Statistics</h3>
-              <p>Today's violations by type</p>
+              <h3>İhlal İstatistikleri</h3>
+
+              <p>Bugünkü ihlallerin türlere göre dağılımı</p>
             </div>
           </div>
-          <ViolationChart data={dashboard.violations_by_type} />{" "}
+
+          <ViolationChart data={dashboard.violations_by_type} />
         </section>
 
         <section className="panel events-placeholder">
           <div className="panel-header">
             <div>
-              <h3>Active Traffic Events</h3>
-              <p>Latest incidents on the road</p>
+              <h3>Aktif Trafik Olayları</h3>
+
+              <p>Yoldaki son aktif olaylar</p>
             </div>
           </div>
 
@@ -103,8 +129,9 @@ function Dashboard() {
       <section className="panel recent-violations">
         <div className="panel-header">
           <div>
-            <h3>Recent Violations</h3>
-            <p>Latest detected traffic violations</p>
+            <h3>Son İhlaller</h3>
+
+            <p>Son tespit edilen trafik ihlalleri</p>
           </div>
         </div>
 

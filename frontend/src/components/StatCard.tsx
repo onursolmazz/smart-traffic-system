@@ -13,6 +13,7 @@ function StatCard({ title, value, icon: Icon, description }: StatCardProps) {
       <div className="stat-card-top">
         <div>
           <p className="stat-title">{title}</p>
+
           <h2 className="stat-value">{value}</h2>
         </div>
 
