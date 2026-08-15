@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Camera;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 
 class CameraService
 {
@@ -17,6 +18,8 @@ class CameraService
     public function create(array $data): Camera
     {
         return Camera::create($data);
+        Cache::forget('dashboard.statistics');
+        return $camera;
     }
 
     public function update(
@@ -24,12 +27,13 @@ class CameraService
         array $data
     ): Camera {
         $camera->update($data);
-
+        Cache::forget('dashboard.statistics');
         return $camera->refresh();
     }
 
     public function delete(Camera $camera): void
     {
         $camera->delete();
+        Cache::forget('dashboard.statistics');
     }
 }

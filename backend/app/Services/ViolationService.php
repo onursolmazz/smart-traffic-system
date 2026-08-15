@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Violation;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 
 class ViolationService
 {
@@ -31,7 +32,7 @@ class ViolationService
     public function create(array $data): Violation
     {
         $violation = Violation::create($data);
-
+        Cache::forget('dashboard.statistics');
         return $this->loadRelations($violation);
     }
 
@@ -40,7 +41,7 @@ class ViolationService
         array $data
     ): Violation {
         $violation->update($data);
-
+        Cache::forget('dashboard.statistics');
         return $this->loadRelations(
             $violation->refresh()
         );
@@ -49,5 +50,6 @@ class ViolationService
     public function delete(Violation $violation): void
     {
         $violation->delete();
+        Cache::forget('dashboard.statistics');
     }
 }

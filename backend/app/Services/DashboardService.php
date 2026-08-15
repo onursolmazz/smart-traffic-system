@@ -7,10 +7,22 @@ use App\Models\TrafficEvent;
 use App\Models\Vehicle;
 use App\Models\Violation;
 use App\Models\ViolationType;
+use Illuminate\Support\Facades\Cache;
 
 class DashboardService
 {
     public function getStatistics(): array
+    {
+        return Cache::remember(
+            'dashboard.statistics',
+            now()->addMinute(10),
+            function () {
+                return $this->buildStatistics();
+            }
+        );
+    }
+
+    private function buildStatistics(): array
     {
         $today = today();
 
@@ -42,7 +54,7 @@ class DashboardService
                     'code' => $type->code,
                     'count' => $type->violations_count,
                 ];
-            });
+            })->toArray();
 
         $recentViolations = Violation::query()
             ->with([
@@ -52,14 +64,16 @@ class DashboardService
             ])
             ->latest('detected_at')
             ->limit(10)
-            ->get();
+            ->get()
+            ->toArray();
 
         $activeTrafficEvents = TrafficEvent::query()
             ->with('camera')
             ->where('status', 'active')
             ->latest('occurred_at')
             ->limit(10)
-            ->get();
+            ->get()
+            ->toArray();
 
         return [
             'total_vehicles' => $totalVehicles,

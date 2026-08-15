@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\TrafficEvent;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 
 class TrafficEventService
 {
@@ -32,7 +33,7 @@ class TrafficEventService
         }
 
         $trafficEvent = TrafficEvent::create($data);
-
+        Cache::forget('dashboard.statistics');
         return $this->loadRelations($trafficEvent);
     }
 
@@ -52,7 +53,7 @@ class TrafficEventService
         }
 
         $trafficEvent->update($data);
-
+        Cache::forget('dashboard.statistics');
         return $this->loadRelations(
             $trafficEvent->refresh()
         );
@@ -62,5 +63,6 @@ class TrafficEventService
         TrafficEvent $trafficEvent
     ): void {
         $trafficEvent->delete();
+        Cache::forget('dashboard.statistics');
     }
 }
