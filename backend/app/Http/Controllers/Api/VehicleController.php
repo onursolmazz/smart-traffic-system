@@ -10,7 +10,7 @@ use App\Models\Vehicle;
 use App\Services\VehicleService;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
-
+use App\Http\Requests\VehicleFilterRequest;
 
 class VehicleController extends Controller
 {
@@ -21,9 +21,12 @@ class VehicleController extends Controller
         private readonly VehicleService $vehicleService
     ) {}
 
-    public function index(): AnonymousResourceCollection
-    {
-        $vehicles = $this->vehicleService->paginate();
+    public function index(
+        VehicleFilterRequest $request
+    ): AnonymousResourceCollection {
+        $vehicles = $this->vehicleService->paginate(
+            $request->validated()
+        );
 
         return VehicleResource::collection($vehicles);
     }

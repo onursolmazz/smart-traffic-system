@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateTrafficEventRequest extends FormRequest
+class UpdateCameraRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -15,56 +15,21 @@ class UpdateTrafficEventRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'camera_id' => [
-                'sometimes',
-                'nullable',
-                Rule::exists('cameras', 'id')
-                    ->whereNull('deleted_at'),
-            ],
-
-            'type' => [
-                'sometimes',
-                'required',
-                Rule::in([
-                    'ACCIDENT',
-                    'ROAD_WORK',
-                    'VEHICLE_BREAKDOWN',
-                    'ROAD_CLOSED',
-                    'TRAFFIC_JAM',
-                ]),
-            ],
-
-            'title' => [
+            'name' => [
                 'sometimes',
                 'required',
                 'string',
-                'max:255',
+                'max:150',
             ],
 
-            'description' => [
+            'code' => [
                 'sometimes',
-                'nullable',
+                'required',
                 'string',
-            ],
+                'max:50',
 
-            'severity' => [
-                'sometimes',
-                'required',
-                Rule::in([
-                    'low',
-                    'medium',
-                    'high',
-                    'critical',
-                ]),
-            ],
-
-            'status' => [
-                'sometimes',
-                'required',
-                Rule::in([
-                    'active',
-                    'resolved',
-                ]),
+                Rule::unique('cameras', 'code')
+                    ->ignore($this->route('camera')),
             ],
 
             'latitude' => [
@@ -81,16 +46,22 @@ class UpdateTrafficEventRequest extends FormRequest
                 'between:-180,180',
             ],
 
-            'occurred_at' => [
+            'status' => [
                 'sometimes',
                 'required',
-                'date',
+                Rule::in([
+                    'active',
+                    'inactive',
+                    'maintenance',
+                ]),
             ],
 
-            'resolved_at' => [
+            'speed_limit' => [
                 'sometimes',
                 'nullable',
-                'date',
+                'integer',
+                'min:1',
+                'max:300',
             ],
         ];
     }

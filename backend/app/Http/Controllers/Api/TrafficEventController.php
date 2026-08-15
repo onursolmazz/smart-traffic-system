@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTrafficEventRequest;
+use App\Http\Requests\TrafficEventFilterRequest;
 use App\Http\Requests\UpdateTrafficEventRequest;
 use App\Http\Resources\TrafficEventResource;
 use App\Models\TrafficEvent;
@@ -17,9 +18,12 @@ class TrafficEventController extends Controller
         private readonly TrafficEventService $trafficEventService
     ) {}
 
-    public function index(): AnonymousResourceCollection
-    {
-        $events = $this->trafficEventService->paginate();
+    public function index(
+        TrafficEventFilterRequest $request
+    ): AnonymousResourceCollection {
+        $events = $this->trafficEventService->paginate(
+            $request->validated()
+        );
 
         return TrafficEventResource::collection($events);
     }

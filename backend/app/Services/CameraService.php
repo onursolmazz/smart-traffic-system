@@ -8,11 +8,41 @@ use Illuminate\Support\Facades\Cache;
 
 class CameraService
 {
-    public function paginate(int $perPage = 15): LengthAwarePaginator
+    public function paginate(array $filters): LengthAwarePaginator
     {
-        return Camera::query()
-            ->latest()
-            ->paginate($perPage);
+        $query = Camera::query();
+
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($query) use ($search) {
+                $query
+                    ->where('name', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%");
+            });
+        }
+
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        if (!empty($filters['speed_limit'])) {
+            $query->where(
+                'speed_limit',
+                $filters['speed_limit']
+            );
+        }
+
+        $sortBy = $filters['sort_by'] ?? 'created_at';
+
+        $sortDirection =
+            $filters['sort_direction'] ?? 'desc';
+
+        $perPage = $filters['per_page'] ?? 15;
+
+        return $query
+            ->orderBy($sortBy, $sortDirection)
+            ->paginate($perPage)
+            ->withQueryString();
     }
 
     public function create(array $data): Camera

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreViolationRequest;
 use App\Http\Requests\UpdateViolationRequest;
+use App\Http\Requests\ViolationFilterRequest;
 use App\Http\Resources\ViolationResource;
 use App\Models\Violation;
 use App\Services\ViolationService;
@@ -17,9 +18,12 @@ class ViolationController extends Controller
         private readonly ViolationService $violationService
     ) {}
 
-    public function index(): AnonymousResourceCollection
-    {
-        $violations = $this->violationService->paginate();
+    public function index(
+        ViolationFilterRequest $request
+    ): AnonymousResourceCollection {
+        $violations = $this->violationService->paginate(
+            $request->validated()
+        );
 
         return ViolationResource::collection($violations);
     }

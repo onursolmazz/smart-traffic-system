@@ -10,6 +10,7 @@ use App\Models\Camera;
 use App\Services\CameraService;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
+use App\Http\Requests\CameraFilterRequest;
 
 class CameraController extends Controller
 {
@@ -17,9 +18,12 @@ class CameraController extends Controller
         private readonly CameraService $cameraService
     ) {}
 
-    public function index(): AnonymousResourceCollection
-    {
-        $cameras = $this->cameraService->paginate();
+    public function index(
+        CameraFilterRequest $request
+    ): AnonymousResourceCollection {
+        $cameras = $this->cameraService->paginate(
+            $request->validated()
+        );
 
         return CameraResource::collection($cameras);
     }
